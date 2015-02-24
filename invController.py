@@ -72,6 +72,15 @@ def main():
 	g.db.close()
 	return render_template('main.html', posts=posts)
 
+@app.route('/layers')
+@login_required
+def layers():
+	g.db = connect_db()
+	cur = g.db.execute('select * from animals where batch like "layer___" order by entryDate DESC')
+	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
+	g.db.close()
+	return render_template('layers.html', posts=posts)
+
 @app.route('/logout/')
 def logout():
 	session.pop('logged_in', None)
