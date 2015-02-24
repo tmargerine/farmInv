@@ -4,17 +4,21 @@
 from functools import wraps
 from flask import Flask, render_template, request, session, flash, redirect, url_for, g
 import sqlite3
+import config
 
 #configuation
-DATABASE = 'farmInv.db'
-USERNAME = 'admin'
-PASSWORD = 'admin'
-SECRET_KEY = '90fd909a93'
+#DATABASE = 'farmInv.db'
+#USERNAME = 'admin'
+#PASSWORD = 'admin'
+#SECRET_KEY = '90fd909a93'
 
 app = Flask(__name__)
 
 #pulls in app configuation by looking for UPPERCASE variable
-app.config.from_object(__name__)
+#app.config.from_object(__name__)
+
+#pulls configuration from file
+app.config.from_object('config')
 
 #function for connection to the DATABASE
 def connect_db():
@@ -68,7 +72,7 @@ def main():
 	g.db.close()
 	return render_template('main.html', posts=posts)
 
-@app.route('/logout')
+@app.route('/logout/')
 def logout():
 	session.pop('logged_in', None)
 	flash('You were logged out')
