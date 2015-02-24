@@ -1,0 +1,27 @@
+2014-08-19,Pig001,Purchase,10,800,SpringFieldAndy
+2014-08-19,Pig001,Dead,-1,80,Died from transport
+2014-08-20,Pig001,Dead,-1,80,Died from transport
+2014-10-11,Pig001,Slaughter,-2,65,MS
+2014-10-14,Pig002,Purchase,10,800,SpringFieldAndy
+2015-02-03,Pig002,Lost,-2,160,???
+2015-02-19,Pig001,Slaughter,-2,930,MS
+2015-02-01,Lambs,Purchase,25,0,Origin
+2015-02-01,Ewes,Purchase,35,0,Origin
+2015-02-01,Rams,Purchase,2,0,Origin
+2015-02-02,Lambs,Slaughter,-5,1170,MS
+2015-02-04,NB,Born,3,,
+2015-02-12,Lambs,Slaughter,-3,696,MS
+2015-02-16,Lambs,Purchase,2,264,Marlin
+2015-02-16,Ewes,Purchase,1,164,Marlin
+2015-02-18,Ewes,Purchase,2,292,LeatherMan
+2015-02-18,Rams,Purchase,1,294,LeatherMan
+2015-02-16,NB,Dead,-1,,Vultures; nb dead
+2015-02-17,NB,Born,1,,
+2015-02-18,Lambs,Slaughter,-3,684,MS
+2015-02-20,NB,Born,1,,
+2015-02-03,Drakes,Purchase,25,,Origin
+2015-02-03,Ducks,Purchase,22,,Origin
+2015-02-03,Ducklings,Purchase,6,,Origin
+2015-02-11,Drakes,Slaughter,-6,174,MS;29lbs
+2015-02-20,Ducks,Purchase,4,80,Moises
+2015-02-16,Ducks,Purchase,1,20,Moises
