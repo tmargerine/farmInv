@@ -116,7 +116,7 @@ def add():
 
 		elif action == "Feed":
 			newVal = ogFeed + actionNo
-			col = "exp"
+			col = "feed"
 			newVal2 = ogExp + value
 			col2= "exp"
 			flag = True
@@ -149,6 +149,47 @@ def main():
 	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
 	g.db.close()
 	return render_template('main.html', posts=posts)
+
+@app.route('/report', methods=['GET', 'POST'])
+@login_required
+def report():
+	g.db = connect_db()
+
+	if request.method == 'POST':
+		startDate = request.form['startDate']
+		endDate = request.form['endDate']
+
+	subQuery = "SELECT * FROM animals WHERE entryDate BETWEEN " + startDate + " AND " + endDate
+	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Broiler___'")
+	temp = cur.fetchone()
+	reportData = dict(broilerSlaughter = temp[0])
+	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Sold' AND batch LIKE 'Broiler___'")
+	temp = cur.fetchone()
+	reportData['broilerSold'] = temp[0]
+
+	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Pig___'")
+	temp = cur.fetchone()
+	reportData['pigSlaughter'] = temp[0]
+
+	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Drakes'")
+	temp = cur.fetchone()
+	reportData['drakeSlaughter'] = temp[0]
+
+	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND (batch LIKE 'Lambs' OR batch ='Ewes')")
+	temp = cur.fetchone()
+	reportData['sheepSlaughter'] = temp[0]
+
+	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Tray' AND batch LIKE 'Layer___'")
+	temp = cur.fetchone()
+	reportData['layerTray'] = temp[0]
+
+	cur = g.db.execute("select * from animals WHERE action in ('Slaughter', 'Sold','Tray') order by entryDate DESC")
+	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
+	g.db.close()
+
+
+	return render_template('report.html', posts = posts, reportData = reportData, total = sum(reportData.itervalues()) )
+
 
 @app.route('/layers')
 @login_required

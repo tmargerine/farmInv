@@ -1,8 +1,9 @@
 {% extends "template.html" %}
 {% block content %}
-	<h2>Wlecome to the Flask blog!</h2>
+	<h2>Wlecome to the Layers!</h2>
 	<p><a href="/logout">Logout</a></p>
-	<h3>Add a new post:</h3>
+	<h3>Monthly Report:</h3>
+	<!--
 	<form action="{{ url_for('add') }}" method="post" class="add">
 		<label><strong>Date(YYYY-MM-DD):</strong></label>
 		<input name="entryDate" type="text">
@@ -17,15 +18,27 @@
 		<label><strong>Notes:</strong></label>
 		<textarea name="notes" rows="1" cols="35"></textarea><br/>
 		<input class="button" type="submit" value="Save"><br/><br/>
-		<p><a href="/report">Monthly Report</a></p>
-		<p><a href="/layers">Layers</a></p>
-		<p><a href="/broilers">Broilers</a></p>
+		<input class="button" type="submit" value="Layers">
 
 	</form>
+	-->
 	<br/>
+	<p>Slaughtered Broilers: {{ reportData.broilerSlaughter }}</p>
+	<p>Sold Broilers: {{ reportData.broilerSold }} </p>
+	<p>Slaughtered Sheep: {{ reportData.sheepSlaughter }} </p>
+	<p>Slaughtered Pigs: {{ reportData.pigSlaughter }}</p>
+	<p>Slaughtered Ducks: {{ reportData.drakeSlaughter }}</p>
+	<p>Trays of eggs: {{ reportData.layerTray }}</p>
+	<p>Total: {{ total }}
 	<br/>
 	<h3>Posts:</h3>
 	{% for p in posts %}
+		
 		{{ p.entryDate }} , {{ p.batch }} , {{ p.action }} , {{ p.actionNo }} , {{ p.value }} , {{ p.notes }} <br/>
+		
+		<!--
+		{{ p.batch }} , {{ p.age }} , {{ p.alive }} , {{ p.cvpb }} , {{ p.slaughtered }} , {{ p.sold }} , {{ p.dead }} , {{ p.totalSales }} , {{ totalExp }} <br/>
+		-->
+
 	{% endfor %}
 {% endblock %}
