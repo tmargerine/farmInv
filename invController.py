@@ -5,6 +5,9 @@ from functools import wraps
 from flask import Flask, render_template, request, session, flash, redirect, url_for, g
 import sqlite3
 import config
+
+from forms import AddTaskForm
+
 #debugger
 import pdb
 
@@ -148,7 +151,7 @@ def main():
 	cur = g.db.execute('select * from animals order by entryDate DESC')
 	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
 	g.db.close()
-	return render_template('main.html', posts=posts)
+	return render_template('main.html', form = AddTaskForm(request.form), posts=posts)
 
 @app.route('/report', methods=['GET', 'POST'])
 @login_required
@@ -158,8 +161,11 @@ def report():
 	if request.method == 'POST':
 		startDate = request.form['startDate']
 		endDate = request.form['endDate']
+	else:
+		startDate = '2000-01-01'
+		endDate = request.form['endDate']
 
-	subQuery = "SELECT * FROM animals WHERE entryDate BETWEEN " + startDate + " AND " + endDate
+	subQuery = "SELECT * FROM animals WHERE entryDate BETWEEN '"+ startDate + "' AND  '" + endDate + "'"
 	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Broiler___'")
 	temp = cur.fetchone()
 	reportData = dict(broilerSlaughter = temp[0])

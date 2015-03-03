@@ -3,25 +3,16 @@
 	<h2>Wlecome to the Layers!</h2>
 	<p><a href="/logout">Logout</a></p>
 	<h3>Monthly Report:</h3>
-	<!--
-	<form action="{{ url_for('add') }}" method="post" class="add">
-		<label><strong>Date(YYYY-MM-DD):</strong></label>
-		<input name="entryDate" type="text">
-		<label><strong>Batch:</strong></label>
-		<input name="batch" type="text"><br/>
-		<label><strong>Action:</strong></label>
-		<input name="action" type="text">
-		<label><strong>ActionNo:</strong></label>
-		<input name="actionNo" type="text"><br/>
-		<label><strong>Value:</strong></label>
-		<input name="value" type="text">
-		<label><strong>Notes:</strong></label>
-		<textarea name="notes" rows="1" cols="35"></textarea><br/>
-		<input class="button" type="submit" value="Save"><br/><br/>
-		<input class="button" type="submit" value="Layers">
+	
+	<form action="{{ url_for('report') }}" method="post" class="add">
+		<label><strong>Start Date:</strong></label>
+		<input name="startDate" type="date">
+		<label><strong>End Date:</strong></label>
+		<input name="endDate" type="date"><br/>
+		<input class="button" type="submit" value="Search"><br/><br/>
 
 	</form>
-	-->
+	
 	<br/>
 	<p>Slaughtered Broilers: {{ reportData.broilerSlaughter }}</p>
 	<p>Sold Broilers: {{ reportData.broilerSold }} </p>

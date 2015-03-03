@@ -2,30 +2,81 @@
 {% block content %}
 	<h2>Wlecome to the Flask blog!</h2>
 	<p><a href="/logout">Logout</a></p>
-	<h3>Add a new post:</h3>
-	<form action="{{ url_for('add') }}" method="post" class="add">
-		<label><strong>Date(YYYY-MM-DD):</strong></label>
-		<input name="entryDate" type="text">
-		<label><strong>Batch:</strong></label>
-		<input name="batch" type="text"><br/>
-		<label><strong>Action:</strong></label>
-		<input name="action" type="text">
-		<label><strong>ActionNo:</strong></label>
-		<input name="actionNo" type="text"><br/>
-		<label><strong>Value:</strong></label>
-		<input name="value" type="text">
-		<label><strong>Notes:</strong></label>
-		<textarea name="notes" rows="1" cols="35"></textarea><br/>
-		<input class="button" type="submit" value="Save"><br/><br/>
-		<p><a href="/report">Monthly Report</a></p>
-		<p><a href="/layers">Layers</a></p>
-		<p><a href="/broilers">Broilers</a></p>
+	<div class="add">
+		<h3>Add a new post:</h3>
+		<table>
+			<tr>
+				<form action="{{ url_for('add') }}" method="post">
+						<label><strong>Date(YYYY-MM-DD):</strong></label>
+						<input name="entryDate" type="text">
+					</td>
+					<td>
+						<label><strong>Batch:</strong></label>
+						<input name="batch" type="text"><br/>
+					</td>
+					<td>
+						<label><strong>Action:</strong></label>
+						<input name="action" type="text">
+					</td>
+					<td>
+						<label><strong>ActionNo:</strong></label>
+						<input name="actionNo" type="text"><br/>
+					</td>
+					<td>
+						<label><strong>Value:</strong></label>
+						<input name="value" type="text">
+					</td>
+					<td>
+						<label><strong>Notes:</strong></label>
+						<textarea name="notes" rows="1" cols="35"></textarea>
+					</td>
 
-	</form>
-	<br/>
-	<br/>
-	<h3>Posts:</h3>
-	{% for p in posts %}
-		{{ p.entryDate }} , {{ p.batch }} , {{ p.action }} , {{ p.actionNo }} , {{ p.value }} , {{ p.notes }} <br/>
-	{% endfor %}
+					<td>
+						&nbsp;
+						&nbsp;
+						<input class="button" type="submit" value="Save">
+					</td>
+				</form>
+			</tr>
+		</table>
+
+	
+	<p><a href="/report">Monthly Report</a></p>
+	<p><a href="/layers">Layers</a></p>
+	<p><a href="/broilers">Broilers</a></p>
+
+	<div class="posts">
+		<br/>
+		<br/>
+		<h3>Posts:</h3>
+		<div class="datagrid">
+			<table>
+				<thead>
+					<tr>
+						<th width="300px"><strong>entryDate</strong></th>
+						<th width="300px"><strong>batch</strong></th>
+						<th width="300px"><strong>action</strong></th>
+						<th width="300px"><strong>actionNo</strong></th>
+						<th width="300px"><strong>Value</strong></th>
+						<td width="300px"><strong>Notes</strong><th>
+					</tr>
+				</thead>
+
+				{% for p in posts %}
+					<tr>
+						<td width="300px">{{ p.entryDate }}</td>
+						<td width="300px">{{ p.batch }}</td>
+						<td width="300px">{{ p.action }}</td>
+						<td width="300px">{{ p.actionNo }}</td>
+						<td width="300px">{{ p.value }}</td>
+						<td width="300px">{{ p.notes }}</td>
+						
+
+					</tr>
+
+				{% endfor %}
+			</table>
+		</div>
+	</div>	
+
 {% endblock %}
