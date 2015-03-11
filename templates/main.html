@@ -5,39 +5,45 @@
 	<div class="add">
 		<h3>Add a new post:</h3>
 		<table>
-			<tr>
-				<form action="{{ url_for('add') }}" method="post">
-						<label><strong>Date(YYYY-MM-DD):</strong></label>
+			<form action="{{ url_for('add') }}" method="post">
+				{{ form.csrf_token }}
+				<tr>
+				
+					<td>
+						<label><strong>Date(YYYY-MM-DD):</strong></label><br/>
 						<input name="entryDate" type="text">
 					</td>
 					<td>
-						<label><strong>Batch:</strong></label>
-						<input name="batch" type="text"><br/>
+						<label><strong>Batch:</strong></label><br/>
+						<input name="batch" type="text">
 					</td>
 					<td>
-						<label><strong>Action:</strong></label>
+						<label><strong>Action:</strong></label><br/>
 						<input name="action" type="text">
 					</td>
+				</tr>
+				<tr>
 					<td>
-						<label><strong>ActionNo:</strong></label>
-						<input name="actionNo" type="text"><br/>
+						<label><strong>ActionNo:</strong></label><br/>
+						<input name="actionNo" type="text">
 					</td>
 					<td>
-						<label><strong>Value:</strong></label>
+						<label><strong>Value:</strong></label><br/>
 						<input name="value" type="text">
 					</td>
 					<td>
-						<label><strong>Notes:</strong></label>
+						<label><strong>Notes:</strong></label></br>
 						<textarea name="notes" rows="1" cols="35"></textarea>
 					</td>
+				</tr>
+				<tr>
 
 					<td>
-						&nbsp;
-						&nbsp;
 						<input class="button" type="submit" value="Save">
 					</td>
-				</form>
-			</tr>
+				</tr>
+			</form>
+			
 		</table>
 
 	
@@ -53,12 +59,12 @@
 			<table>
 				<thead>
 					<tr>
-						<th width="300px"><strong>entryDate</strong></th>
-						<th width="300px"><strong>batch</strong></th>
-						<th width="300px"><strong>action</strong></th>
-						<th width="300px"><strong>actionNo</strong></th>
-						<th width="300px"><strong>Value</strong></th>
-						<td width="300px"><strong>Notes</strong><th>
+						<th width="300px" align="left"><strong>entryDate</strong></th>
+						<th width="300px" align="left"><strong>batch</strong></th>
+						<th width="300px" align="left"><strong>action</strong></th>
+						<th width="300px" align="left"><strong>actionNo</strong></th>
+						<th width="300px" align="left"><strong>Value</strong></th>
+						<td width="300px" align="left"><strong>Notes</strong><th>
 					</tr>
 				</thead>
 

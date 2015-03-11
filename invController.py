@@ -3,13 +3,20 @@
 #imports
 from functools import wraps
 from flask import Flask, render_template, request, session, flash, redirect, url_for, g
-import sqlite3
+from flask.ext.sqlalchemy import SQLAlchemy
 import config
-
 from forms import AddTaskForm
-
 #debugger
 import pdb
+
+app = Flask(__name__)
+#pulls configuration from file
+app.config.from_object('config')
+db = SQLAlchemy(app)
+
+from models import Entry, Broiler, Layer, Pig
+
+####OLD CODE
 
 #configuation
 #DATABASE = 'farmInv.db'
@@ -17,17 +24,20 @@ import pdb
 #PASSWORD = 'admin'
 #SECRET_KEY = '90fd909a93'
 
-app = Flask(__name__)
-
 #pulls in app configuation by looking for UPPERCASE variable
 #app.config.from_object(__name__)
 
-#pulls configuration from file
-app.config.from_object('config')
+####OLD CODE
 
+
+
+
+#no longer needed
+
+#import sqlite3
 #function for connection to the DATABASE
-def connect_db():
-	return sqlite3.connect(app.config['DATABASE'])
+#def connect_db():
+	#return sqlite3.connect(app.config['DATABASE'])
 
 def login_required(test):
 	@wraps(test)
@@ -39,6 +49,12 @@ def login_required(test):
 			return redirect(url_for('login'))
 	return wrap
 
+@app.route('/logout/')
+def logout():
+	session.pop('logged_in', None)
+	flash('You were logged out')
+	return redirect(url_for('login'))
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -46,180 +62,150 @@ def login():
 	if request.method == 'POST':
 		if request.form['username'] != app.config['USERNAME'] or request.form['password'] != app.config['PASSWORD']:
 			error = 'Invalid Credentials. Please try again.'
+			return render_template('login.html', error=error)
 		else:
 			session['logged_in'] = True
 			return redirect(url_for('main'))
-	return render_template('login.html', error=error)
+	if request.method == 'GET':
+			return render_template('login.html')
 
-@app.route('/add', methods=['POST'])
+
+@app.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
-	entryDate = request.form['entryDate']
-	batch = request.form['batch']
-	action = request.form['action']
-	actionNo = int(request.form['actionNo'])
-	value = float(request.form['value'])
-	table = request.form['batch']
-	dbTable = table[:-3]
+	form = AddTaskForm(request.form)
+	#pdb.set_trace()
+	if request.method == 'POST':
+		if form.validate_on_submit():
+			new_entry = Entry(
+				form.entryDate.data,
+				form.batch.data,
+				form.action.data,
+				form.actionNo.data,
+				form.value.data,
+				form.notes.data)
+			## TEMPORARY SKIP
+			db.session.add(new_entry)
+			db.session.commit()
 
-	if not entryDate or not batch:
-		flash("All fields are required. Please try again.")
-		return redirect(url_for('main'))
-	else:
-		g.db = connect_db()
-		g.db.execute('insert into animals (entryDate, batch, action, actionNo, value, notes) values (?, ?, ?, ?, ?, ?)', [request.form['entryDate'], request.form['batch'], request.form['action'], request.form['actionNo'], request.form['value'], request.form['notes']])
-
-		#start new code
-		if action == "Purchase":
-			cvpb = value / actionNo
-			g.db.execute("INSERT INTO " + dbTable + " (batch, purDate, alive, cvpb, special, sold, dead, feed, time, sales, exp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [batch, entryDate, actionNo, cvpb, 0, 0, 0, 0, 0, 0, value])
-			g.db.commit()
-			flash('New entry was successfully posted!')
-			return redirect(url_for('main'))
-		else:
-			#get data from specific animal table so we can update
-			query0 = "SELECT * FROM " + dbTable + " WHERE batch = '" + batch +"'"
-
-			temp = g.db.execute(query0)
-			ogData = temp.fetchone()
-			#debug
+	###OLD CODE
+			entryDate = form.entryDate.data
+			batch = form.batch.data
+			action = form.action.data
+			actionNo = form.actionNo.data
+			value = form.value.data
+			notes = form.notes.data
+			
+			#dbTable = batch[:-3]
 			#pdb.set_trace()
 
-			ogPurchDate = ogData[1]
-			ogAlive = ogData[2]
-			ogCVPB = ogData[3]
-			ogSlaughtered = ogData[4]
-			ogSold = ogData[5]
-			ogDead = ogData[6]
-			ogFeed = ogData[7]
-			ogTime = ogData[8]
-			ogSales = ogData[9]
-			ogExp = ogData[10]
-			flag = False					
+			#start new code
+			if action == "Purchase":
+				cvpb = value / actionNo
+				#batch_detail = [batch, entryDate, actionNo, cvpb, 0, 0, 0, 0, 0, 0, value]
+				if "Broiler" in batch:
+					create_broiler = Broiler(batch, entryDate, actionNo, float(cvpb), 0, 0, 0, 0.0, 0.0, 0.0, float(value))
+					db.session.add(create_broiler)
+				elif "Layer" in batch:
+					create_layer = Layer(batch, entryDate, actionNo, float(cvpb), 0, 0, 0, 0.0, 0.0, 0.0, float(value))
+					db.session.add(create_layer)
+				elif "Pig" in batch:
+					create_pig = Broiler(batch, entryDate, actionNo, float(cvpb), 0, 0, 0, 0.0, 0.0, 0.0, float(value))
+					db.session.add(create_pig)
+				
+				db.session.commit()
+				flash('New entry was successfully posted!')
+				return redirect(url_for('main'))
+			else:
+				if "Broiler" in batch:
+					#pdb.set_trace()
+					table = Broiler
+					record = db.session.query(Broiler).filter_by(batch=batch).first()
+				elif "Layer" in batch:
+					table = Layer
+					record = db.session.query(Layer).filter_by(batch=batch).first()
+				elif "Pig" in batch:
+					table = Pig
+					record = db.session.query(Pig).filter_by(batch=batch).first()
 
-		if action == "Dead" or action == "Lost":
-			#update Dead data for batch, but data from animals table or form will be negative
-			newVal = ogDead - actionNo
-			col = "dead"
+				#ogAlive = ogData[2]
+				#ogCVPB = ogData[3]
+				#ogSlaughtered = ogData[4]
+				#ogSold = ogData[5]
+				#ogDead = ogData[6]
+				#ogFeed = ogData[7]
+				#ogTime = ogData[8]
+				#ogSales = ogData[9]
+				#ogExp = ogData[10]
+				#flag = False					
 
-		elif action == "Slaughter" or action == "Tray":
-			#update slaughtered data
-			newVal = ogSlaughtered + actionNo
-			col = "special"
-			newVal2 = ogSales + value
-			col2= "sales"
-			flag = True
+			if action == "Dead" or action == "Lost":
+				#update Dead data for batch, but data from animals table or form will be negative
+				newVal = int(record.dead) - int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"dead": newVal})
+				alive = int(record.alive) + int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"alive": newVal})
 
-		elif action == "Sold":
-			newVal = ogSold + actionNo
-			col = "sold"
-			newVal2 = ogSales + value
-			col2= "sales"
-			flag = True
+			#may need to use str(action)
+			elif "Slaughter" in action:
+				#update slaughtered data
+				#pdb.set_trace()
+				newVal = int(record.special) - int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"special": newVal})
+				
+				alive = int(record.alive) + int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"alive": alive})
+										
+				newVal2 = float(record.sales) + float(value)
+				db.session.query(table).filter_by(batch=batch).update({"sales": newVal2})
+				
+			elif action == "Tray":
+				newVal = int(record.special) + int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"special": newVal})
+				
+				newVal2 = float(record.sales) + float(value)
+				db.session.query(table).filter_by(batch=batch).update({"sales": newVal2})
 
-		elif action == "Feed":
-			newVal = ogFeed + actionNo
-			col = "feed"
-			newVal2 = ogExp + value
-			col2= "exp"
-			flag = True
+			elif action == "Sold":
+				newVal = int(record.sold) - int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"sold": newVal})
+				
+				newVal2 = float(record.sales) + float(value)
+				db.session.query(table).filter_by(batch=batch).update({"sales": newVal2})
 
-		elif action == "Time":
-			newVal = ogTime + actionNo
-			col = "Time"
-			newVal2 = ogExp + value
-			col2= "exp"
-			flag = True
+				alive = int(record.alive) + int(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"alive": newVal})
 
-		if flag:
-			query2 = "UPDATE " + dbTable + " SET " + col2 + " = " + str(newVal2) + " WHERE batch = '" + batch + "'"
-			g.db.execute(query2)
+			elif action == "Feed":
+				newVal = float(record.feed) + float(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"feed": newVal})
+				
+				newVal2 = float(record.exp) + float(value)
+				db.session.query(table).filter_by(batch=batch).update({"exp": newVal2})
+				
 
-		query = "UPDATE " + dbTable + " SET " + col + " = " + str(newVal) + " WHERE batch = '" + batch + "'"
-		g.db.execute(query)
+			elif action == "Time":
+				newVal = float(record.time) + float(actionNo)
+				db.session.query(table).filter_by(batch=batch).update({"time": newVal})
+				
+				newVal2 = float(record.exp) + float(value)
+				db.session.query(table).filter_by(batch=batch).update({"exp": newVal2})
 
-		#End new code
-		g.db.commit()
-		g.db.close()
-		flash('New entry was successfully posted!')
+
+			#End new code
+			db.session.commit()
+			flash('New entry was successfully posted!')
 		return redirect(url_for('main'))
+
+	####////OLD CODE
 
 @app.route('/main')
 @login_required
 def main():
-	g.db = connect_db()
-	cur = g.db.execute('select * from animals order by entryDate DESC')
-	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
-	g.db.close()
+	posts = db.session.query(Entry).order_by(Entry.entryDate.desc())
 	return render_template('main.html', form = AddTaskForm(request.form), posts=posts)
 
-@app.route('/report', methods=['GET', 'POST'])
-@login_required
-def report():
-	g.db = connect_db()
 
-	if request.method == 'POST':
-		startDate = request.form['startDate']
-		endDate = request.form['endDate']
-	else:
-		startDate = '2000-01-01'
-		endDate = request.form['endDate']
-
-	subQuery = "SELECT * FROM animals WHERE entryDate BETWEEN '"+ startDate + "' AND  '" + endDate + "'"
-	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Broiler___'")
-	temp = cur.fetchone()
-	reportData = dict(broilerSlaughter = temp[0])
-	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Sold' AND batch LIKE 'Broiler___'")
-	temp = cur.fetchone()
-	reportData['broilerSold'] = temp[0]
-
-	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Pig___'")
-	temp = cur.fetchone()
-	reportData['pigSlaughter'] = temp[0]
-
-	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND batch LIKE 'Drakes'")
-	temp = cur.fetchone()
-	reportData['drakeSlaughter'] = temp[0]
-
-	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Slaughter' AND (batch LIKE 'Lambs' OR batch ='Ewes')")
-	temp = cur.fetchone()
-	reportData['sheepSlaughter'] = temp[0]
-
-	cur = g.db.execute("SELECT sum(value) FROM animals WHERE action = 'Tray' AND batch LIKE 'Layer___'")
-	temp = cur.fetchone()
-	reportData['layerTray'] = temp[0]
-
-	cur = g.db.execute("select * from animals WHERE action in ('Slaughter', 'Sold','Tray') order by entryDate DESC")
-	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
-	g.db.close()
-
-
-	return render_template('report.html', posts = posts, reportData = reportData, total = sum(reportData.itervalues()) )
-
-
-@app.route('/layers')
-@login_required
-def layers():
-	g.db = connect_db()
-	cur = g.db.execute('select * from animals where batch like "Layer___" order by entryDate DESC')
-	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
-	g.db.close()
-	return render_template('layers.html', posts=posts)
-
-@app.route('/broilers')
-@login_required
-def broilers():
-	g.db = connect_db()
-	cur = g.db.execute('select * from animals where batch like "Broiler___" order by entryDate DESC')
-	posts = [dict(entryDate=row[0], batch=row[1], action=row[2], actionNo=row[3], value=row[4], notes=row[5]) for row in cur.fetchall()]
-	g.db.close()
-	return render_template('broilers.html', posts=posts)
-
-@app.route('/logout/')
-def logout():
-	session.pop('logged_in', None)
-	flash('You were logged out')
-	return redirect(url_for('login'))
 
 if __name__ == '__main__':
 	app.run(debug=True)
