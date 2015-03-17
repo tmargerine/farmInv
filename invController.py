@@ -1,20 +1,21 @@
 # FarmInv controller
-
-#imports
-from functools import wraps
-from flask import Flask, render_template, request, session, flash, redirect, url_for, g
-from flask.ext.sqlalchemy import SQLAlchemy
-import config
-from forms import AddTaskForm
 #debugger
 import pdb
 
+#imports
+from functools import wraps
+from flask import Flask, render_template, request, session, flash, redirect, url_for 
+from flask.ext.sqlalchemy import SQLAlchemy
+import config
+from forms import AddTaskForm, RegisterForm, LoginForm
+
+#COnfiguration
 app = Flask(__name__)
 #pulls configuration from file
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-from models import Entry, Broiler, Layer, Pig
+from models import Entry, Broiler, Layer, Pig, User
 
 ####OLD CODE
 
@@ -27,17 +28,17 @@ from models import Entry, Broiler, Layer, Pig
 #pulls in app configuation by looking for UPPERCASE variable
 #app.config.from_object(__name__)
 
-####OLD CODE
+####END OLD CODE
 
 
 
 
-#no longer needed
-
+#####no longer needed
 #import sqlite3
 #function for connection to the DATABASE
 #def connect_db():
 	#return sqlite3.connect(app.config['DATABASE'])
+#####End No Longer Needed
 
 def login_required(test):
 	@wraps(test)
@@ -59,15 +60,28 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 def login():
 	error = None
+	form = LoginForm(request.form)
 	if request.method == 'POST':
-		if request.form['username'] != app.config['USERNAME'] or request.form['password'] != app.config['PASSWORD']:
-			error = 'Invalid Credentials. Please try again.'
-			return render_template('login.html', error=error)
+		if form.validate_on_submit():
+			u = User.query.filter_by(
+				name=request.form['name'],
+				password=request.form['password']
+				).first()
+			if u is None:
+				error = 'Invalid username or passowrd.'
+				return render_template("login.html", form=form, error=error)
+			else:
+				session['logged_in'] = True
+				flash('Your are logged in. Go Crazy.')
+				return redirect(url_for('main'))
 		else:
-			session['logged_in'] = True
-			return redirect(url_for('main'))
+			return render_template("login.html", form=form, error=error)
+
+
+		
+
 	if request.method == 'GET':
-			return render_template('login.html')
+			return render_template('login.html', form=form)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -160,6 +174,7 @@ def add():
 				db.session.query(table).filter_by(batch=batch).update({"sales": newVal2})
 				
 			elif action == "Tray":
+				#pdb.set_trace()
 				newVal = int(record.special) + int(actionNo)
 				db.session.query(table).filter_by(batch=batch).update({"special": newVal})
 				
@@ -198,6 +213,29 @@ def add():
 		return redirect(url_for('main'))
 
 	####////OLD CODE
+
+#USer Registartation
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+	error = None
+	form = RegisterForm(request.form)
+	if request.method == 'POST':
+		if form.validate_on_submit():
+			new_user = User(
+				form.name.data,
+				form.email.data,
+				form.password.data)
+			db.session.add(new_user)
+			db.session.commit()
+			flash('Thanks for registering. Please Login.')
+			return redirect(url_for('login'))
+		else:
+			return render_template('register.html', form=form, error=error)
+	if request.method == 'GET':
+		return render_template('register.html', form=form)
+		
+
+
 
 @app.route('/main')
 @login_required
