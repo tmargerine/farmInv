@@ -25,3 +25,7 @@ class RegisterForm(Form):
 class LoginForm(Form):
 	name = TextField('Username', validators=[DataRequired()])
 	password = PasswordField('Password', validators=[DataRequired()])
+
+class SearchDateForm(Form):
+	startDate = TextField("startDate", validators=[DataRequired()])
+	endDate = TextField("endDate", validators=[DataRequired()])

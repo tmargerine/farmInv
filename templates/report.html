@@ -1,35 +1,55 @@
 {% extends "template.html" %}
 {% block content %}
-	<h2>Wlecome to the Layers!</h2>
+	<h2>Wlecome to Monthly report!</h2>
 	<p><a href="/logout">Logout</a></p>
 	<h3>Monthly Report:</h3>
 	
 	<form action="{{ url_for('report') }}" method="post" class="add">
+		{{ form.csrf_token }}
 		<label><strong>Start Date:</strong></label>
-		<input name="startDate" type="date">
+		<input name="startDate" type="text">
 		<label><strong>End Date:</strong></label>
-		<input name="endDate" type="date"><br/>
+		<input name="endDate" type="text"><br/>
 		<input class="button" type="submit" value="Search"><br/><br/>
 
 	</form>
 	
 	<br/>
-	<p>Slaughtered Broilers: {{ reportData.broilerSlaughter }}</p>
-	<p>Sold Broilers: {{ reportData.broilerSold }} </p>
-	<p>Slaughtered Sheep: {{ reportData.sheepSlaughter }} </p>
-	<p>Slaughtered Pigs: {{ reportData.pigSlaughter }}</p>
-	<p>Slaughtered Ducks: {{ reportData.drakeSlaughter }}</p>
-	<p>Trays of eggs: {{ reportData.layerTray }}</p>
-	<p>Total: {{ total }}
-	<br/>
-	<h3>Posts:</h3>
-	{% for p in posts %}
-		
-		{{ p.entryDate }} , {{ p.batch }} , {{ p.action }} , {{ p.actionNo }} , {{ p.value }} , {{ p.notes }} <br/>
-		
-		<!--
-		{{ p.batch }} , {{ p.age }} , {{ p.alive }} , {{ p.cvpb }} , {{ p.slaughtered }} , {{ p.sold }} , {{ p.dead }} , {{ p.totalSales }} , {{ totalExp }} <br/>
-		-->
 
-	{% endfor %}
+	<br/>
+	<!-- List posts -->
+	<div class="posts">
+		<br/>
+		<br/>
+		<h3>Posts:</h3>
+		<div class="datagrid">
+			<table>
+				<thead>
+					<tr>
+						<th width="300px" align="left"><strong>entryDate</strong></th>
+						<th width="300px" align="left"><strong>batch</strong></th>
+						<th width="300px" align="left"><strong>action</strong></th>
+						<th width="300px" align="left"><strong>actionNo</strong></th>
+						<th width="300px" align="left"><strong>Value</strong></th>
+						<td width="300px" align="left"><strong>Notes</strong><th>
+					</tr>
+				</thead>
+
+				{% for p in posts %}
+					<tr>
+						<td width="300px">{{ p.entryDate }}</td>
+						<td width="300px">{{ p.batch }}</td>
+						<td width="300px">{{ p.action }}</td>
+						<td width="300px">{{ p.actionNo }}</td>
+						<td width="300px">{{ p.value }}</td>
+						<td width="300px">{{ p.notes }}</td>
+						
+
+					</tr>
+
+				{% endfor %}
+			</table>
+		</div>
+	</div>	
+
 {% endblock %}

@@ -7,7 +7,9 @@ from functools import wraps
 from flask import Flask, render_template, request, session, flash, redirect, url_for 
 from flask.ext.sqlalchemy import SQLAlchemy
 import config
-from forms import AddTaskForm, RegisterForm, LoginForm
+from forms import AddTaskForm, RegisterForm, LoginForm, SearchDateForm
+
+import datetime
 
 #COnfiguration
 app = Flask(__name__)
@@ -76,9 +78,6 @@ def login():
 				return redirect(url_for('main'))
 		else:
 			return render_template("login.html", form=form, error=error)
-
-
-		
 
 	if request.method == 'GET':
 			return render_template('login.html', form=form)
@@ -234,7 +233,30 @@ def register():
 	if request.method == 'GET':
 		return render_template('register.html', form=form)
 		
+@app.route('/report', methods=['GET','POST'])
+@login_required
+def report():
+	error = None
+	form=SearchDateForm(request.form)
+	if request.method == 'POST':
+		if form.validate_on_submit():
+			startDate = form.startDate.data
+			endDate = form.endDate.data
+			posts = db.session.query(Entry).filter(Entry.entryDate.between(startDate, endDate)).order_by(Entry.entryDate.desc())
 
+			
+			flash('Report betweeen ' + startDate + ' and ' + endDate)
+			return render_template('report.html', form=form, posts=posts)
+
+		else:
+			return render_template('report.html', form=form, error=error)
+	
+	if request.method == 'GET':
+		startDate = (datetime.date.today() - datetime.timedelta(1*365/12)).isoformat()
+		endDate = datetime.date.today()
+		reportData = db.session.query(Entry).filter(Entry.entryDate.between(startDate, endDate))
+		pdb.set_trace()
+		return render_template('report.html', form=form, posts=reportData)
 
 
 @app.route('/main')
