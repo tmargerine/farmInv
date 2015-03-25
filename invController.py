@@ -111,6 +111,9 @@ def add():
 			
 			#dbTable = batch[:-3]
 			#pdb.set_trace()
+			if ("Sheep" or "Duck") in batch:
+				flash('New entry was successfully posted!')
+				return redirect(url_for('main'))
 
 			#start new code
 			if action == "Purchase":
@@ -125,7 +128,7 @@ def add():
 				elif "Pig" in batch:
 					create_pig = Broiler(batch, entryDate, actionNo, float(cvpb), 0, 0, 0, 0.0, 0.0, 0.0, float(value))
 					db.session.add(create_pig)
-				
+					
 				db.session.commit()
 				flash('New entry was successfully posted!')
 				return redirect(url_for('main'))
@@ -157,7 +160,7 @@ def add():
 				newVal = int(record.dead) - int(actionNo)
 				db.session.query(table).filter_by(batch=batch).update({"dead": newVal})
 				alive = int(record.alive) + int(actionNo)
-				db.session.query(table).filter_by(batch=batch).update({"alive": newVal})
+				db.session.query(table).filter_by(batch=batch).update({"alive": alive})
 
 			#may need to use str(action)
 			elif "Slaughter" in action:
@@ -188,7 +191,7 @@ def add():
 				db.session.query(table).filter_by(batch=batch).update({"sales": newVal2})
 
 				alive = int(record.alive) + int(actionNo)
-				db.session.query(table).filter_by(batch=batch).update({"alive": newVal})
+				db.session.query(table).filter_by(batch=batch).update({"alive": alive})
 
 			elif action == "Feed":
 				newVal = float(record.feed) + float(actionNo)
@@ -244,9 +247,63 @@ def report():
 			endDate = form.endDate.data
 			posts = db.session.query(Entry).filter(Entry.entryDate.between(startDate, endDate)).order_by(Entry.entryDate.desc())
 
-			
+			#get summary data
+			#layerTray = db.session.query(Entry).func.sum(Entry.special).label('trays')
+			#pdb.set_trace()
+
+			# Meat Shop
+			tray1 = 0
+			trayValue1 = 0
+			broilerSlaughter1 = 0
+			broilerValue1 = 0
+			pigSlaughter1 = 0
+			pigValue1 = 0
+			sheepSlaughter1 = 0
+			sheepValue1 = 0
+			duckSlaughter1 = 0
+			duckTray1 = 0
+			duckValue1 = 0
+
+			tray2 = 0
+			trayValue2 = 0
+			broilerSlaughter2 = 0
+			broilerValue2 = 0
+			pigSlaughter2 = 0
+			pigValue2 = 0
+			sheepSlaughter2 = 0
+			sheepValue2 = 0
+			duckSlaughter2 = 0
+			duckTray2 = 0
+			duckValue2 = 0
+
+			for post in posts:
+				if "Layer" in post.batch and post.action == "Tray":
+					if "MS" in post.notes:
+						tray1 = tray1 + post.actionNo
+						trayValue1 = trayValue1 + post.value
+					else:
+						tray2 = tray2 + post.actionNo
+						trayValue2 = trayValue2 + post.value
+				if "Broiler" in post.batch and "Slaughter" in post.action:
+					broilerSlaughter1 = broilerSlaughter1 + (post.actionNo * -1)
+					broilerValue1 = broilerValue1 + post.value
+				if "Pig" in post.batch and post.action == "Slaughter":
+					pigSlaughter1 = pigSlaughter1 + (post.actionNo *-1)
+					pigValue1 = pigValue1 + post.value
+				if "Sheep" in post.batch and post.action == "Slaughter":
+					sheepSlaughter1 = sheepSlaughter1 + (post.actionNo *-1)
+					sheepValue1 = sheepValue1 + post.value
+				if "Duck" in post.batch and post.action == "Slaughter":
+					duckSlaughter1 = duckSlaughter1 + (post.actionNo * -1)
+					duckValue1 = duckValue1 + post.value
+				if "Duck" in post.batch and post.action == "Tray":
+					duckTray1 =	duckTray1 + post.actionNo
+					duckValue1 = duckValue1 + post.value 
+
+			totalValue1 = trayValue1 + broilerValue1 + pigValue1 + sheepValue1 + duckValue1
+			meatShop = [tray1, trayValue1, broilerSlaughter1, broilerValue1, pigSlaughter1, pigValue1, sheepSlaughter1, sheepValue1, duckSlaughter1, duckTray1, duckValue1, totalValue1]
 			flash('Report betweeen ' + startDate + ' and ' + endDate)
-			return render_template('report.html', form=form, posts=posts)
+			return render_template('report.html', form=form, posts=posts, meat_shop=meatShop)
 
 		else:
 			return render_template('report.html', form=form, error=error)
@@ -254,9 +311,61 @@ def report():
 	if request.method == 'GET':
 		startDate = (datetime.date.today() - datetime.timedelta(1*365/12)).isoformat()
 		endDate = datetime.date.today()
-		reportData = db.session.query(Entry).filter(Entry.entryDate.between(startDate, endDate))
-		pdb.set_trace()
-		return render_template('report.html', form=form, posts=reportData)
+		posts = db.session.query(Entry).filter(Entry.entryDate.between(startDate, endDate))
+
+		# Meat Shop
+		tray1 = 0
+		trayValue1 = 0
+		broilerSlaughter1 = 0
+		broilerValue1 = 0
+		pigSlaughter1 = 0
+		pigValue1 = 0
+		sheepSlaughter1 = 0
+		sheepValue1 = 0
+		duckSlaughter1 = 0
+		duckTray1 = 0
+		duckValue1 = 0
+
+		tray2 = 0
+		trayValue2 = 0
+		broilerSlaughter2 = 0
+		broilerValue2 = 0
+		pigSlaughter2 = 0
+		pigValue2 = 0
+		sheepSlaughter2 = 0
+		sheepValue2 = 0
+		duckSlaughter2 = 0
+		duckTray2 = 0
+		duckValue2 = 0
+
+		for post in posts:
+			if "Layer" in post.batch and post.action == "Tray":
+				if "MS" in post.notes:
+					tray1 = tray1 + post.actionNo
+					trayValue1 = trayValue1 + post.value
+				else:
+					tray2 = tray2 + post.actionNo
+					trayValue2 = trayValue2 + post.value
+			if "Broiler" in post.batch and "Slaughter" in post.action:
+				broilerSlaughter1 = broilerSlaughter1 + (post.actionNo * -1)
+				broilerValue1 = broilerValue1 + post.value
+			if "Pig" in post.batch and post.action == "Slaughter":
+				pigSlaughter1 = pigSlaughter1 + (post.actionNo *-1)
+				pigValue1 = pigValue1 + post.value
+			if "Sheep" in post.batch and post.action == "Slaughter":
+				sheepSlaughter1 = sheepSlaughter1 + (post.actionNo *-1)
+				sheepValue1 = sheepValue1 + post.value
+			if "Duck" in post.batch and post.action == "Slaughter":
+				duckSlaughter1 = duckSlaughter1 + (post.actionNo * -1)
+				duckValue1 = duckValue1 + post.value
+			if "Duck" in post.batch and post.action == "Tray":
+				duckTray1 =	duckTray1 + post.actionNo
+				duckValue1 = duckValue1 + post.value 
+
+		totalValue1 = trayValue1 + broilerValue1 + pigValue1 + sheepValue1 + duckValue1
+		meatShop = [tray1, trayValue1, broilerSlaughter1, broilerValue1, pigSlaughter1, pigValue1, sheepSlaughter1, sheepValue1, duckSlaughter1, duckTray1, duckValue1, totalValue1]
+
+		return render_template('report.html', form=form, posts=posts, meat_shop=meatShop)
 
 
 @app.route('/main')

@@ -1,7 +1,7 @@
 {% extends "template.html" %}
 {% block content %}
 	<h2>Wlecome to Monthly report!</h2>
-	<p><a href="/logout">Logout</a></p>
+	<p><a href="/logout">Logout</a>&emsp;<a href='/main'>Home</a></p>
 	<h3>Monthly Report:</h3>
 	
 	<form action="{{ url_for('report') }}" method="post" class="add">
@@ -13,6 +13,145 @@
 		<input class="button" type="submit" value="Search"><br/><br/>
 
 	</form>
+	
+	<br/>
+
+	<br/>
+	<div class="datagrid">
+		<table>
+			<thead>
+				<tr>
+					<th width="100px" align="center"><strong></strong></th>
+					<th width="150px" align="center"><strong></strong></th>
+					<th width="150px" align="center"><strong>Meat Shop</strong></th>
+					<th width="150px" align="center"><strong>Other</strong></th>
+					<th width="150px" align="center"><strong>Total</strong></th>
+				</tr>
+			</thead>
+			<tr>
+				<td width="100px">Layers:</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Tray #</td>
+				<td width="150px" align="right">{{ meat_shop[0] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Trays Val</td>
+				<td width="150px" align="right">${{ meat_shop[1] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px">Broilers:</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter #</td>
+				<td width="150px" align="right">{{ meat_shop[2] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter Val</td>
+				<td width="150px" align="right">${{ meat_shop[3] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px">Pigs:</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter #</td>
+				<td width="150px" align="right">{{ meat_shop[4] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter Val</td>
+				<td width="150px" align="right">${{ meat_shop[5] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px">Sheep:</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter #</td>
+				<td width="150px" align="right">{{ meat_shop[6] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter Val</td>
+				<td width="150px" align="right">${{ meat_shop[7] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px">Ducks:</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Slaughter #</td>
+				<td width="150px" align="right">{{ meat_shop[8] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Tray #</td>
+				<td width="150px" align="right">{{ meat_shop[9] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr>
+				<td width="100px"></td>
+				<td width="150px">Duck Val</td>
+				<td width="150px" align="right">${{ meat_shop[10] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+			</tr>
+			<tr></tr>
+			<tr>
+				<td width="100px">Total:</td>
+				<td width="150px"></td>
+				<td width="150px" align="right">${{ meat_shop[11] }}</td>
+				<td width="150px"></td>
+				<td width="150px"></td>
+
+
+		</table>
+	</div>
 	
 	<br/>
 
